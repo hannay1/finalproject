@@ -21,7 +21,8 @@ function imgloaded(loaded, img, source) {
 var bg = new imgloaded(true, new Image(), "images/background.jpg");
 var p1 = new imgloaded(true, new Image(), "images/red.png");
 var p2 = new imgloaded(true, new Image(), "images/blue.png");
-var flg = new imgloaded(true, new Image(), "images/flag.png");
+var flgr = new imgloaded(true, new Image(), "images/redflag.gif");
+var flgb = new imgloaded(true, new Image(), "images/blueflag.gif")
 var bgoal = new imgloaded(true, new Image(), "images/goal1.png");
 var rgoal = new imgloaded(true, new Image(), "images/goal2.png");
 
@@ -30,19 +31,20 @@ var rgoal = new imgloaded(true, new Image(), "images/goal2.png");
 var bluegoal = {};
 var redgoal = {};
 var team = [];
-var flag = {};
+var rflag = {};
+var bflag = {};
 var possteams = ["red", "blue"];
 var r = possteams[0];
 var b = possteams[1];
 
 
 
-function players(speed, isflag, team, points, canscore) {
+function players(speed, isflag, team, points) {
     this.speed = speed;
     this.isflag = isflag;
     this.team = team;
     this.points = points;
-    this.canscore = canscore
+    
 }
 
 var player1 = new players(125, false, r, 0, false);
@@ -68,7 +70,9 @@ addEventListener("keyup", function(e) {
 }, false);
 
 
-var positions = function() {
+function positions() {
+    player1.isflag = false;
+    player2.isflag = false;
 
     player1.x = (w / 2) - 35;
     player1.y = 640;
@@ -76,8 +80,12 @@ var positions = function() {
     player2.x = (w / 2) - 35;
     player2.y = 30;
 
-    flag.x = (w / 2);
-    flag.y = (h / 2);
+    //implement way to have flag reapear in random locations after colliding with a player carrying flag 
+    rflag.x = 32 + Math.floor((Math.random() * (w - 64)));
+    rflag.y = 32 + Math.floor((Math.random() * (h - 64)));
+
+    bflag.x = 32 + Math.floor((Math.random() * (w - 64)));
+    bflag.y = 32 + Math.floor((Math.random() * (h - 64)));
 
     bluegoal.x = (w / 2) - 30;
     bluegoal.y = 0;
@@ -87,7 +95,8 @@ var positions = function() {
 
 }
 
-var reload = function(arg1) { //need to implement some way to sort input from player1/player2 keyboards later
+function reload(arg1) { 
+//need to 
 
 
     if (38 in press) { // Player 1 holding up
@@ -118,7 +127,6 @@ var reload = function(arg1) { //need to implement some way to sort input from pl
 
     collisionwallred();
     collisionwallblue();
-    //checkforcarry();
     checkifRisflag();
     checkifBisflag();
     checkifRscore();
@@ -156,32 +164,23 @@ function collisionwallblue()
         player2.y = 0;
     }
 }
-/*
 
-function checkforcarry() 
-{
-    if (player1.isflag === true || player2.isflag === true)
-    {
-
-    }
-}
-*/
 
 function checkifRisflag() {
 
     if (
-        player1.x <= (flag.x + 32) 
-        && flag.x <= (player1.x + 32) 
-        && player1.y <= (flag.y + 32) 
-        && flag.y <= (player1.y + 32)
+        player1.x <= (bflag.x + 32) 
+        && bflag.x <= (player1.x + 32) 
+        && player1.y <= (bflag.y + 32) 
+        && bflag.y <= (player1.y + 32)
 
     ) {
     
         player1.isflag = true;
         console.log("player1 is carrying flag ", player1.isflag);
-        delete flag;
         player1.x = player1.x; //keeps p1 moving after flag capture
         player1.y = player1.y;
+
         
         //reload();
 
@@ -192,10 +191,10 @@ function checkifRisflag() {
 
 function checkifBisflag() {
     if (
-        player2.x <= (flag.x + 32) 
-        && flag.x <= (player2.x + 32) 
-        && player2.y <= (flag.y + 32) 
-        && flag.y <= (player2.y + 32)
+        player2.x <= (rflag.x + 32) 
+        && rflag.x <= (player2.x + 32) 
+        && player2.y <= (rflag.y + 32) 
+        && rflag.y <= (player2.y + 32)
 
     ) {
         
@@ -217,10 +216,10 @@ function checkifRscore ()
     if (player1.isflag === true)
     {
         if (
-        player1.x <= (bluegoal.x + 32) 
-        && bluegoal.x <= (player1.x + 32) 
-        && player1.y <= (bluegoal.y + 32) 
-        && bluegoal.y <= (player1.y + 32)
+        player1.x <= (redgoal.x + 32) 
+        && redgoal.x <= (player1.x + 32) 
+        && player1.y <= (redgoal.y + 32) 
+        && redgoal.y <= (player1.y + 32)
 
     ) {
            
@@ -228,10 +227,7 @@ function checkifRscore ()
         console.log("red scored");
         console.log(player1.points);
         player1.isflag = false;
-       
-
-
-
+        positions();
         //need to implement way of removing flag until point is scored
     }
     }
@@ -243,16 +239,17 @@ function checkifBscore ()
     if (player2.isflag === true)
     {
         if (
-        player2.x <= (redgoal.x + 32) 
-        && redgoal.x <= (player2.x + 32) 
-        && player2.y <= (redgoal.y + 32) 
-        && redgoal.y <= (player2.y + 32)
+        player2.x <= (bluegoal.x + 32) 
+        && bluegoal.x <= (player2.x + 32) 
+        && player2.y <= (bluegoal.y + 32) 
+        && bluegoal.y <= (player2.y + 32)
 
     ) {
         player2.points++;
         console.log("blue scored");
         console.log(player2.points);
         player2.isflag = false;
+        positions();
 
         //need to implement way of removing flag until point is scored
     }
@@ -262,8 +259,7 @@ function checkifBscore ()
 
 
 
-
-var begin = function() {
+function begin() {
     if (bg.loaded === true) {
         ctx.drawImage(bg.img, 0, 0);
     }
@@ -274,13 +270,21 @@ var begin = function() {
     if (p2.loaded === true) {
         ctx.drawImage(p2.img, player2.x, player2.y);
     }
-    if(player1.isflag === false && player2.isflag === false)
+    if(player1.isflag === false)
     {
-            if (flg.loaded === true)
+            if (flgb.loaded === true)
             {
-            ctx.drawImage(flg.img, flag.x, flag.y);
+            ctx.drawImage(flgb.img, bflag.x, bflag.y);
             }
     }
+    if(player2.isflag === false)
+    {
+            if (flgr.loaded === true)
+            {
+            ctx.drawImage(flgr.img, rflag.x, rflag.y);
+            }
+    }
+
     if (bgoal.loaded === true) {
         ctx.drawImage(bgoal.img, bluegoal.x, bluegoal.y);
     }
@@ -289,19 +293,16 @@ var begin = function() {
     }
 };
 
-var main = function() { //main function. 
+function reset () 
+{
     var now = Date.now();
-    //console.log(now)
-    var delta = now - then;
-
-    reload(delta / 500);
+    var diff = now - then;
+    reload(diff / 500);
     begin();
-
     then = now;
+    requestAnimationFrame(reset);
+}
 
-    requestAnimationFrame(main); //main callback for updating image properties onscreen
-};
-
-var then = Date.now(); //in between this and main(), the difference will be saved in var then for use the next time main is called
+var then = Date.now(); //in between this and main(), the new time will be saved in var then for use the next time main is called
 positions();
-main();
+reset();
