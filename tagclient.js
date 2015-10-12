@@ -96,8 +96,6 @@ function positions() {
 }
 
 function reload(arg1) { 
-//need to 
-
 
     if (38 in press) { // Player 1 holding up
         player1.y -= player1.speed * arg1;
@@ -178,13 +176,9 @@ function checkifRisflag() {
     
         player1.isflag = true;
         console.log("player1 is carrying flag ", player1.isflag);
-        player1.x = player1.x; //keeps p1 moving after flag capture
-        player1.y = player1.y;
+        
 
         
-        //reload();
-
-        //need to implement way of removing flag until point is scored
     
     }
 };
@@ -201,12 +195,6 @@ function checkifBisflag() {
   
         player2.isflag = true;
         console.log("player2 is carrying flag ", player2.isflag);
-        player2.x = player2.x; //keeps p2 moving after flag capture
-        player2.y = player2.y;
-        
-        //reload();
-       
-    
 
     }
 };
@@ -228,7 +216,6 @@ function checkifRscore ()
         console.log(player1.points);
         player1.isflag = false;
         positions();
-        //need to implement way of removing flag until point is scored
     }
     }
 
