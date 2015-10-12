@@ -112,21 +112,19 @@ var reload = function(arg1) { //need to implement some way to sort input from pl
         player2.x += player2.speed * arg1;
     }
 
-    if (player1.x + 48 > canvas.width) {
-        player1.x = canvas.width - 48;
+    if (player1.x  + 48 > w) {
+        player1.x = w - 48;
     }
     if (player1.x < 0) {
-        player1.x = 0;
+    	player1.x = 0;
     }
-    if (player1.x > 1280) {
-        player1.x = 1280;
+    if (player1.y + 48 > h) {
+    	player1.y = h - 48;
+    }
+    if (player1.y < 0) {
+    	player1.y = 0;
     };
-    if (player1.y > 720) {
-        player1.y = 720;
-    };
-    if (player1.y < 0 ) {
-        player1.y = 0;
-    };
+ 
 
     checkifRisflag();
     checkifBisflag();
