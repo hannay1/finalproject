@@ -10,10 +10,10 @@ var h = canvas.height;
 
 
 
-function imgloaded(loaded, img, source) {
+function imgloaded(loaded, img, src) {
     this.loaded = loaded;
     this.img = img;
-    this.img.src = source;
+    this.img.src = src;
     this.img.onload = function() {
         loaded = true;
     }
@@ -27,6 +27,7 @@ var flgr = new imgloaded(true, new Image(), "images/redflag.gif");
 var flgb = new imgloaded(true, new Image(), "images/blueflag.gif")
 var bgoal = new imgloaded(true, new Image(), "images/goal1.png");
 var rgoal = new imgloaded(true, new Image(), "images/goal2.png");
+
 
 
 
@@ -331,6 +332,7 @@ function begin() {
 };
 
 
+
 function fromRtoServ()
 { 
         var xhr = new XMLHttpRequest();
@@ -344,35 +346,11 @@ function fromRtoServ()
 function fromBtoServ()
 {
         var xhr = new XMLHttpRequest();
-        var url = "send_posB?x=" + blueplayer.x + "&y=" + blueplayer.y + "&team=" +blueplayer.team;
+        var url = "send_posB?x=" + blueplayer.x + "&y=" + blueplayer.y + "&team=" +blueplayer.team ;
         console.log(url);
         xhr.open( "get", url, true );
         xhr.send();
 }
-
-
-/*
-function pollServerRed( most_recent_version )
-{
-
-}
-
-function pollServerBlue(most_recent_version)
-{
-    //need this function to ask the server if there is any difference in the position of blue
-}
-
-function redResponse (evt)
-{
-    //need this function to move red accordigly
-}
-
-function blueResponse(evt)
-{
-    
-}
-
-*/
 
 
 function reset () 

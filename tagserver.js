@@ -69,8 +69,6 @@ function serverDynamic(req, res)
 
 }
 
-
-
 function serverFun( req, res )
 {
     //console.log( "The URL: '", req.url, "'" );
