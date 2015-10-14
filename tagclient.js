@@ -8,6 +8,8 @@ var w = canvas.width;
 var h = canvas.height;
 
 
+
+
 function imgloaded(loaded, img, source) {
     this.loaded = loaded;
     this.img = img;
@@ -39,53 +41,80 @@ var b = possteams[1];
 
 
 
-function players(speed, isflag, team, points) {
+function players(speed, isflag, team, points, timeStamp) 
+{
     this.speed = speed;
     this.isflag = isflag;
     this.team = team;
     this.points = points;
-    
+    this.timeStamp = timeStamp; 
+   
 }
 
-var player1 = new players(125, false, r, 0, false);
-team.push(player1);
+var redplayer = new players(215, false, r, 0, Date);
+team.push(redplayer);
 
-var player2 = new players(125, false, b, 0, false);
-team.push(player2);
+var blueplayer = new players(215, false, b, 0, Date);
+team.push(blueplayer);
 
 console.log(team);
 
 // we need a team sorter once server functionality is implemented 
 
-var press = {};
 
-addEventListener("keydown", function(e) {
-    press[e.keyCode] = true;
-    console.log("key was pressed");
+var rpress = {};
+
+addEventListener("keydown", function(evt) {
+    
+    rpress[evt.keyCode] = true;
+    if(38 in rpress || 40 in rpress || 37 in rpress || 39 in rpress)
+    {
+        fromRtoServ();
+    }
+    //console.log("key was pressed");
 }, false);
 
-addEventListener("keyup", function(e) {
-    delete press[e.keyCode];
-    console.log("key was released");
+
+addEventListener("keyup", function(evt) {
+    delete rpress[evt.keyCode];
+    //console.log("key was released"); 
 }, false);
 
 
-function positions() {
-    player1.isflag = false;
-    player2.isflag = false;
+var bpress = {};
 
-    player1.x = (w / 2) - 35;
-    player1.y = 640;
+addEventListener("keydown", function(evt) {
+    bpress[evt.keyCode] = true;
+    if(87 in rpress || 83 in rpress || 65 in rpress || 68 in rpress)
+    {
+        fromBtoServ();
+    }
+    //console.log("key was pressed"); 
+}, false);
 
-    player2.x = (w / 2) - 35;
-    player2.y = 30;
+addEventListener("keyup", function(evt) {
+    delete bpress[evt.keyCode];
+    //console.log("key was released");
+}, false);
+
+
+
+function reload() {
+    redplayer.isflag = false;
+    blueplayer.isflag = false;
+
+    redplayer.x = (w / 2) - 35;
+    redplayer.y = 640;
+
+    blueplayer.x = (w / 2) - 35;
+    blueplayer.y = 30;
 
     //implement way to have flag reapear in random locations after colliding with a player carrying flag 
-    rflag.x = 32 + Math.floor((Math.random() * (w - 64)));
-    rflag.y = 32 + Math.floor((Math.random() * (h - 64)));
+    rflag.x = 32 + (Math.random(490-690) * (w - 64));
+    rflag.y = 32 + (Math.random(490-690) * (h - 64));
 
-    bflag.x = 32 + Math.floor((Math.random() * (w - 64)));
-    bflag.y = 32 + Math.floor((Math.random() * (h - 64)));
+    bflag.x = 32 + (Math.random(0-200) * (w - 64));
+    bflag.y = 32 + (Math.random(0-200) * (h - 64));
 
     bluegoal.x = (w / 2) - 30;
     bluegoal.y = 0;
@@ -95,32 +124,44 @@ function positions() {
 
 }
 
-function reload(arg1) { 
+function positions(speed) 
+{ 
+    var redup = 38 in rpress;
+    var reddown = 40 in rpress;
+    var redleft = 37 in rpress;
+    var redright = 39 in rpress;
+    var bluup = 87 in bpress; //w
+    var bludown = 83 in bpress;
+    var bluleft = 65 in bpress;
+    var bluright = 68 in bpress
 
-    if (38 in press) { // Player 1 holding up
-        player1.y -= player1.speed * arg1;
+
+
+    if (redup) { // Player 1 holding up
+        redplayer.y -= redplayer.speed * speed;
+        //console.log("red moved up");
     }
-    if (40 in press) { // Player  1holding down
-        player1.y += player1.speed * arg1;
+    if (reddown) { // Player  1holding down
+        redplayer.y += redplayer.speed * speed;
     }
-    if (37 in press) { // Player 1 holding left
-        player1.x -= player1.speed * arg1;
+    if (redleft) { // Player 1 holding left
+        redplayer.x -= redplayer.speed * speed;
     }
-    if (39 in press) { // Player 1 holding right
-        player1.x += player1.speed * arg1;
+    if (redright) { // Player 1 holding right
+        redplayer.x += redplayer.speed * speed;
     }
 
-    if (87 in press) { // Player 2 holding up, these will all eventually be mapped to other server inptu
-        player2.y -= player2.speed * arg1;
+    if (bluup) { // Player 2 holding up, these will all eventually be mapped to other server inptu
+        blueplayer.y -= blueplayer.speed * speed;   
     }
-    if (83 in press) { // Player 2 holding down
-        player2.y += player2.speed * arg1;
+    if (bludown) { // Player 2 holding down
+        blueplayer.y += blueplayer.speed * speed;
     }
-    if (65 in press) { // Player 2 holding left
-        player2.x -= player2.speed * arg1;
+    if (bluleft) { // Player 2 holding left
+        blueplayer.x -= blueplayer.speed * speed;
     }
-    if (68 in press) { // Player 2 holding right
-        player2.x += player2.speed * arg1;
+    if (bluright) { // Player 2 holding right
+        blueplayer.x += blueplayer.speed * speed;
     }
 
     collisionwallred();
@@ -129,37 +170,38 @@ function reload(arg1) {
     checkifBisflag();
     checkifRscore();
     checkifBscore();
+    
 };
 
 function collisionwallred() 
 {
-    if (player1.x  + 48 > w) {
-        player1.x = w - 48;
+    if (redplayer.x  + 48 > w) {
+        redplayer.x = w - 48;
     }
-    if (player1.x < 0) {
-        player1.x = 0;
+    if (redplayer.x < 0) {
+        redplayer.x = 0;
     }
-    if (player1.y + 48 > h) {
-        player1.y = h - 48;
+    if (redplayer.y + 48 > h) {
+        redplayer.y = h - 48;
     }
-    if (player1.y < 0) {
-        player1.y = 0;
+    if (redplayer.y < 0) {
+        redplayer.y = 0;
     }
 }
 
 function collisionwallblue()
 {
-    if (player2.x  + 48 > w) {
-        player2.x = w - 48;
+    if (blueplayer.x  + 48 > w) {
+        blueplayer.x = w - 48;
     }
-    if (player2.x < 0) {
-        player2.x = 0;
+    if (blueplayer.x < 0) {
+        blueplayer.x = 0;
     }
-    if (player2.y + 48 > h) {
-        player2.y = h - 48;
+    if (blueplayer.y + 48 > h) {
+        blueplayer.y = h - 48;
     }
-    if (player2.y < 0) {
-        player2.y = 0;
+    if (blueplayer.y < 0) {
+        blueplayer.y = 0;
     }
 }
 
@@ -167,55 +209,51 @@ function collisionwallblue()
 function checkifRisflag() {
 
     if (
-        player1.x <= (bflag.x + 32) 
-        && bflag.x <= (player1.x + 32) 
-        && player1.y <= (bflag.y + 32) 
-        && bflag.y <= (player1.y + 32)
+        redplayer.x <= (bflag.x + 32) 
+        && bflag.x <= (redplayer.x + 32) 
+        && redplayer.y <= (bflag.y + 32) 
+        && bflag.y <= (redplayer.y + 32)
 
     ) {
     
-        player1.isflag = true;
-        console.log("player1 is carrying flag ", player1.isflag);
-        
-
-        
-    
+        redplayer.isflag = true;
+        console.log("redplayer is carrying flag ", redplayer.isflag); 
     }
 };
 
 function checkifBisflag() {
     if (
-        player2.x <= (rflag.x + 32) 
-        && rflag.x <= (player2.x + 32) 
-        && player2.y <= (rflag.y + 32) 
-        && rflag.y <= (player2.y + 32)
+        blueplayer.x <= (rflag.x + 32) 
+        && rflag.x <= (blueplayer.x + 32) 
+        && blueplayer.y <= (rflag.y + 32) 
+        && rflag.y <= (blueplayer.y + 32)
 
     ) {
         
   
-        player2.isflag = true;
-        console.log("player2 is carrying flag ", player2.isflag);
+        blueplayer.isflag = true;
+        console.log("blueplayer is carrying flag ", blueplayer.isflag);
 
     }
 };
 
 function checkifRscore () 
 {   
-    if (player1.isflag === true)
+    if (redplayer.isflag === true)
     {
         if (
-        player1.x <= (redgoal.x + 32) 
-        && redgoal.x <= (player1.x + 32) 
-        && player1.y <= (redgoal.y + 32) 
-        && redgoal.y <= (player1.y + 32)
+        redplayer.x <= (redgoal.x + 32) 
+        && redgoal.x <= (redplayer.x + 32) 
+        && redplayer.y <= (redgoal.y + 32) 
+        && redgoal.y <= (redplayer.y + 32)
 
     ) {
            
-        player1.points++
+        redplayer.points++
         console.log("red scored");
-        console.log(player1.points);
-        player1.isflag = false;
-        positions();
+        console.log(redplayer.points);
+        redplayer.isflag = false;
+        reload();
     }
     }
 
@@ -223,28 +261,25 @@ function checkifRscore ()
 
 function checkifBscore () 
 {   
-    if (player2.isflag === true)
+    if (blueplayer.isflag === true)
     {
         if (
-        player2.x <= (bluegoal.x + 32) 
-        && bluegoal.x <= (player2.x + 32) 
-        && player2.y <= (bluegoal.y + 32) 
-        && bluegoal.y <= (player2.y + 32)
+        blueplayer.x <= (bluegoal.x + 32) 
+        && bluegoal.x <= (blueplayer.x + 32) 
+        && blueplayer.y <= (bluegoal.y + 32) 
+        && bluegoal.y <= (blueplayer.y + 32)
 
     ) {
-        player2.points++;
+        blueplayer.points++;
         console.log("blue scored");
-        console.log(player2.points);
-        player2.isflag = false;
-        positions();
+        console.log(blueplayer.points);
+        blueplayer.isflag = false;
+        reload();
 
-        //need to implement way of removing flag until point is scored
     }
     }
 
 }
-
-
 
 function begin() {
     if (bg.loaded === true) {
@@ -252,19 +287,20 @@ function begin() {
     }
 
     if (p1.loaded === true) {
-        ctx.drawImage(p1.img, player1.x, player1.y);
+
+        ctx.drawImage(p1.img, redplayer.x, redplayer.y);
     }
     if (p2.loaded === true) {
-        ctx.drawImage(p2.img, player2.x, player2.y);
+        ctx.drawImage(p2.img, blueplayer.x, blueplayer.y);
     }
-    if(player1.isflag === false)
+    if(redplayer.isflag === false)
     {
             if (flgb.loaded === true)
             {
             ctx.drawImage(flgb.img, bflag.x, bflag.y);
             }
     }
-    if(player2.isflag === false)
+    if(blueplayer.isflag === false)
     {
             if (flgr.loaded === true)
             {
@@ -278,18 +314,78 @@ function begin() {
     if (rgoal.loaded === true) {
         ctx.drawImage(rgoal.img, redgoal.x, redgoal.y);
     }
+     if (checkifRscore) {
+            ctx.fillStyle = "rgb(250, 250, 250)";
+            ctx.font = "24px Helvetica";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            ctx.fillText("Red: " + redplayer.points, 32, 32);
+    }
+    if (checkifBscore) {
+            ctx.fillStyle = "rgb(250, 250, 250)";
+            ctx.font = "24px Helvetica";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillText("Blue: " + blueplayer.points, 32, 32);
+    }
 };
+
+
+function fromRtoServ()
+{ 
+        var xhr = new XMLHttpRequest();
+        var url = "send_posR?x=" + redplayer.x + "&y=" + redplayer.y + "&team=" +redplayer.team;
+        console.log(url);
+        xhr.open( "get", url, true );
+        xhr.send(); 
+        
+}
+
+function fromBtoServ()
+{
+        var xhr = new XMLHttpRequest();
+        var url = "send_posB?x=" + blueplayer.x + "&y=" + blueplayer.y + "&team=" +blueplayer.team;
+        console.log(url);
+        xhr.open( "get", url, true );
+        xhr.send();
+}
+
+
+/*
+function pollServerRed( most_recent_version )
+{
+
+}
+
+function pollServerBlue(most_recent_version)
+{
+    //need this function to ask the server if there is any difference in the position of blue
+}
+
+function redResponse (evt)
+{
+    //need this function to move red accordigly
+}
+
+function blueResponse(evt)
+{
+    
+}
+
+*/
+
 
 function reset () 
 {
     var now = Date.now();
     var diff = now - then;
-    reload(diff / 500);
+    positions(diff / 1000);
     begin();
     then = now;
     requestAnimationFrame(reset);
 }
-
+//window.setTimeout(fromRtoServ, 100);
+//window.setTimeout(fromBtoServ, 100);
 var then = Date.now(); //in between this and main(), the new time will be saved in var then for use the next time main is called
-positions();
+reload();
 reset();
